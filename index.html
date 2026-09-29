@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Taskflow — Modern To-Do List</title>
-  <meta name="description" content="Taskflow is a sleek, modern to-do list app to help you organize your day with style." />
+  <title>Taskflow — Modern To-Do List with Rewards</title>
+  <meta name="description" content="Taskflow is a sleek, modern to-do list app with coin rewards, streaks, recurring tasks, and progress tracking." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -33,6 +33,16 @@
         <h1>Taskflow</h1>
       </div>
       <div class="header-stats">
+        <!-- Streak display -->
+        <div class="stat stat-streak" id="stat-streak" title="Current daily streak">
+          <span class="stat-number">0</span>
+          <span class="stat-label">🔥 Streak</span>
+        </div>
+        <!-- Coin display -->
+        <div class="stat stat-coins" id="stat-coins" title="Total coins earned">
+          <span class="stat-number">0</span>
+          <span class="stat-label">🪙 Coins</span>
+        </div>
         <div class="stat" id="stat-pending">
           <span class="stat-number">0</span>
           <span class="stat-label">Pending</span>
@@ -43,6 +53,16 @@
         </div>
       </div>
     </header>
+
+    <!-- Streak Banner (shown when streak is active) -->
+    <div class="streak-banner" id="streak-banner" style="display:none;">
+      <div class="streak-flame" aria-hidden="true">🔥</div>
+      <div class="streak-info">
+        <span class="streak-days" id="streak-days">0 day streak!</span>
+        <span class="streak-msg" id="streak-msg">Complete a task today to keep it going!</span>
+      </div>
+      <div class="streak-flame" aria-hidden="true">🔥</div>
+    </div>
 
     <!-- Input area -->
     <form class="task-input-area" id="task-form">
@@ -60,7 +80,7 @@
         />
       </div>
 
-      <!-- Category & Priority Selectors -->
+      <!-- Category, Priority, Deadline, Recurrence Selectors -->
       <div class="input-options">
         <div class="select-group">
           <label for="category-select" class="sr-only">Category</label>
@@ -79,6 +99,33 @@
             <option value="high">🔴 High</option>
           </select>
         </div>
+        <div class="select-group">
+          <label for="recurrence-select" class="sr-only">Recurrence</label>
+          <select id="recurrence-select">
+            <option value="none">📌 One-time</option>
+            <option value="daily">🔄 Daily</option>
+            <option value="weekly">📅 Weekly</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: Deadline + Progress toggle + Add button -->
+      <div class="input-options input-options-row2">
+        <div class="select-group deadline-group">
+          <label for="deadline-input" class="sr-only">Deadline</label>
+          <input type="datetime-local" id="deadline-input" class="deadline-picker" />
+        </div>
+        <div class="select-group progress-toggle-group">
+          <label class="progress-toggle-label" for="progress-toggle">
+            <input type="checkbox" id="progress-toggle" />
+            <span class="progress-toggle-switch"></span>
+            <span>Progress task</span>
+          </label>
+        </div>
+        <div class="select-group progress-steps-group" id="progress-steps-group" style="display:none;">
+          <label for="progress-steps-input" class="sr-only">Total Steps</label>
+          <input type="number" id="progress-steps-input" class="progress-steps-input" min="2" max="100" value="5" placeholder="Steps" />
+        </div>
         <button type="submit" class="btn-add" id="btn-add">
           <span>Add Task</span>
           <svg viewBox="0 0 20 20" fill="none" width="18" height="18">
@@ -93,6 +140,7 @@
       <button class="filter-btn active" data-filter="all">All</button>
       <button class="filter-btn" data-filter="pending">Pending</button>
       <button class="filter-btn" data-filter="completed">Completed</button>
+      <button class="filter-btn" data-filter="recurring">Recurring</button>
       <div class="filter-indicator" id="filter-indicator"></div>
     </div>
 
@@ -127,6 +175,18 @@
       </button>
     </div>
   </div>
+
+  <!-- Coin Reward Popup (native dialog) -->
+  <dialog class="coin-dialog" id="coin-dialog">
+    <div class="coin-dialog-content">
+      <div class="coin-burst" id="coin-burst" aria-hidden="true"></div>
+      <div class="coin-icon-big" id="coin-icon-big">🪙</div>
+      <h2 class="coin-dialog-title" id="coin-dialog-title">+10 Coins!</h2>
+      <p class="coin-dialog-subtitle" id="coin-dialog-subtitle">Task completed!</p>
+      <div class="coin-dialog-breakdown" id="coin-dialog-breakdown"></div>
+      <button class="coin-dialog-btn" id="coin-dialog-close">Awesome!</button>
+    </div>
+  </dialog>
 
   <script src="app.js"></script>
 </body>
